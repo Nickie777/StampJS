@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF and Image Overlay</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/konva/8.3.3/konva.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0;
+        }
+        #pdf-container {
+            flex: 1;
+            border: 1px solid #000;
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pdf-page {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        .checkbox-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .checkbox-container label {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button id="load-pdf">Load PDF</button>
+        <button id="load-image">Load Image</button>
+        <div id="checkbox-container" class="checkbox-container"></div>
+    </div>
+    <div id="pdf-container"></div>
+    <input type="file" id="pdf-file-input" accept="application/pdf" style="display:none;">
+    <input type="file" id="image-file-input" accept="image/png" style="display:none;">
+    <script src="script.js"></script>
+</body>
+</html>
