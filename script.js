@@ -1,32 +1,36 @@
-document.getElementById('load-pdf').addEventListener('click', () => {
-    document.getElementById('pdf-file-input').click();
+document.addEventListener('DOMContentLoaded', () => {
+    const pdfPath = document.getElementById('pdf-path').value;
+    const imagePath = document.getElementById('image-path').value;
+
+    console.log('PDF Path:', pdfPath);
+    console.log('Image Path:', imagePath);
+
+    if (pdfPath) {
+        loadPDF(pdfPath);
+    }
+
+    document.getElementById('overlay-image').addEventListener('click', () => {
+        if (imagePath) {
+            overlayImage(imagePath);
+        }
+    });
 });
 
-document.getElementById('load-image').addEventListener('click', () => {
-    document.getElementById('image-file-input').click();
-});
-
-const pdfFileInput = document.getElementById('pdf-file-input');
-const imageFileInput = document.getElementById('image-file-input');
 const pdfContainer = document.getElementById('pdf-container');
 const checkboxContainer = document.getElementById('checkbox-container');
 let pdfDoc = null;
 let konvaLayers = []; // To store Konva layers for each page
 
-pdfFileInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file.type === 'application/pdf') {
-        const fileReader = new FileReader();
-        fileReader.onload = function () {
-            const typedarray = new Uint8Array(this.result);
-            pdfjsLib.getDocument(typedarray).promise.then((pdf) => {
-                pdfDoc = pdf;
-                renderAllPages().then(() => createCheckboxes(pdf.numPages));
-            });
-        };
-        fileReader.readAsArrayBuffer(file);
-    }
-});
+function loadPDF(pdfPath) {
+    const loadingTask = pdfjsLib.getDocument(pdfPath);
+    loadingTask.promise.then((pdf) => {
+        console.log('PDF loaded');
+        pdfDoc = pdf;
+        renderAllPages().then(() => createCheckboxes(pdf.numPages));
+    }).catch(error => {
+        console.error('Error loading PDF:', error);
+    });
+}
 
 async function renderAllPages() {
     konvaLayers = []; // Reset layers
@@ -89,54 +93,47 @@ function createCheckboxes(numPages) {
     }
 }
 
-imageFileInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file.type.startsWith('image/')) {
-        const fileReader = new FileReader();
-        fileReader.onload = function () {
-            const imageObj = new Image();
-            imageObj.onload = function () {
-                const selectedPages = getSelectedPages();
-                selectedPages.forEach(pageNum => {
-                    const layer = konvaLayers[pageNum - 1].layer;
-                    const image = new Konva.Image({
-                        x: 50,
-                        y: 50,
-                        image: imageObj,
-                        draggable: true
-                    });
-                    layer.add(image);
-                    layer.draw();
+function overlayImage(imagePath) {
+    const imageObj = new Image();
+    imageObj.onload = function () {
+        const selectedPages = getSelectedPages();
+        selectedPages.forEach(pageNum => {
+            const layer = konvaLayers[pageNum - 1].layer;
+            const image = new Konva.Image({
+                x: 50,
+                y: 50,
+                image: imageObj,
+                draggable: true
+            });
+            layer.add(image);
+            layer.draw();
 
-                    image.on('dblclick', () => {
-                        const clone = image.clone({
-                            x: image.x() + 20,
-                            y: image.y() + 20
-                        });
-                        layer.add(clone);
-                        layer.draw();
-                    });
-
-                    image.on('transform', () => {
-                        image.setAttrs({
-                            width: image.width() * image.scaleX(),
-                            height: image.height() * image.scaleY(),
-                            scaleX: 1,
-                            scaleY: 1
-                        });
-                    });
-
-                    const tr = new Konva.Transformer();
-                    layer.add(tr);
-                    tr.nodes([image]);
-                    layer.draw();
+            image.on('dblclick', () => {
+                const clone = image.clone({
+                    x: image.x() + 20,
+                    y: image.y() + 20
                 });
-            };
-            imageObj.src = this.result;
-        };
-        fileReader.readAsDataURL(file);
-    }
-});
+                layer.add(clone);
+                layer.draw();
+            });
+
+            image.on('transform', () => {
+                image.setAttrs({
+                    width: image.width() * image.scaleX(),
+                    height: image.height() * image.scaleY(),
+                    scaleX: 1,
+                    scaleY: 1
+                });
+            });
+
+            const tr = new Konva.Transformer();
+            layer.add(tr);
+            tr.nodes([image]);
+            layer.draw();
+        });
+    };
+    imageObj.src = imagePath;
+}
 
 function getSelectedPages() {
     const checkboxes = document.querySelectorAll('#checkbox-container input[type="checkbox"]');

@@ -49,13 +49,12 @@
 </head>
 <body>
     <div id="controls">
-        <button id="load-pdf">Load PDF</button>
-        <button id="load-image">Load Image</button>
+        <input type="hidden" id="pdf-path" value="http://192.168.141.220:8080/document.pdf">
+        <input type="hidden" id="image-path" value="http://192.168.141.220:8080/image.png">
         <div id="checkbox-container" class="checkbox-container"></div>
+        <button id="overlay-image">Установить печать</button>
     </div>
     <div id="pdf-container"></div>
-    <input type="file" id="pdf-file-input" accept="application/pdf" style="display:none;">
-    <input type="file" id="image-file-input" accept="image/png" style="display:none;">
     <script src="script.js"></script>
 </body>
 </html>
