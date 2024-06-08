@@ -45,14 +45,19 @@
         .checkbox-container label {
             margin: 0 10px;
         }
+        #current-page {
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
     </style>
 </head>
 <body>
     <div id="controls">
-        <input type="hidden" id="pdf-path" value="http://192.168.141.220:8080/document.pdf">
-        <input type="hidden" id="image-path" value="http://192.168.141.220:8080/image.png">
+        <input type="hidden" id="pdf-path" value="http://192.168.156.220:8080/document.pdf">
+        <input type="hidden" id="image-path" value="http://192.168.156.220:8080/image.png">
         <div id="checkbox-container" class="checkbox-container"></div>
         <button id="overlay-image">Установить печать</button>
+        <div id="current-page">Текущая страница: <span id="page-number">1</span></div>
     </div>
     <div id="pdf-container"></div>
     <script src="script.js"></script>

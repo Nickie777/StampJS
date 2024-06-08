@@ -14,12 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
             overlayImage(imagePath);
         }
     });
+
+    // Добавляем обработчик прокрутки
+    const pdfContainer = document.getElementById('pdf-container');
+    pdfContainer.addEventListener('scroll', onScroll);
 });
 
 const pdfContainer = document.getElementById('pdf-container');
 const checkboxContainer = document.getElementById('checkbox-container');
 let pdfDoc = null;
-let konvaLayers = []; // To store Konva layers for each page
+let konvaLayers = [];
 
 function loadPDF(pdfPath) {
     const loadingTask = pdfjsLib.getDocument(pdfPath);
@@ -33,8 +37,8 @@ function loadPDF(pdfPath) {
 }
 
 async function renderAllPages() {
-    konvaLayers = []; // Reset layers
-    pdfContainer.innerHTML = ''; // Clear previous content
+    konvaLayers = [];
+    pdfContainer.innerHTML = '';
 
     for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
         const page = await pdfDoc.getPage(pageNum);
@@ -77,11 +81,11 @@ function setupKonvaStage(container, canvas, pageNum) {
 
     const layer = new Konva.Layer();
     stage.add(layer);
-    konvaLayers[pageNum - 1] = { stage, layer }; // Ensure correct indexing
+    konvaLayers[pageNum - 1] = { stage, layer };
 }
 
 function createCheckboxes(numPages) {
-    checkboxContainer.innerHTML = ''; // Clear previous checkboxes
+    checkboxContainer.innerHTML = '';
     for (let i = 1; i <= numPages; i++) {
         const label = document.createElement('label');
         const checkbox = document.createElement('input');
@@ -144,4 +148,22 @@ function getSelectedPages() {
         }
     });
     return selectedPages;
+}
+
+function onScroll() {
+    const pdfPages = document.querySelectorAll('.pdf-page');
+    let currentPage = 1;
+    let smallestOffset = Infinity;
+
+    pdfPages.forEach((pageDiv, index) => {
+        const rect = pageDiv.getBoundingClientRect();
+        const offset = Math.abs(rect.top);
+
+        if (offset < smallestOffset) {
+            smallestOffset = offset;
+            currentPage = index + 1;
+        }
+    });
+
+    document.getElementById('page-number').textContent = currentPage;
 }
